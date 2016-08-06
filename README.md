@@ -30,7 +30,7 @@ This guide was last updated for Swift 2.2 on 7/20/2016.
 ## 1. Code Formatting
 
 * **1.1** Use 4 spaces for tabs.
-* **1.2** Avoid uncomfortably long lines with a hard maximum of 160 characters per line (Xcode->Preferences->Text Editing->Page guide at column: 160 is helpful for this)
+* **1.2** Avoid uncomfortably long lines with a hard maximum of 120 characters per line (Xcode->Preferences->Text Editing->Page guide at column: 120 is helpful for this)
 * **1.3** Ensure that there is a newline at the end of every file.
 * **1.4** Ensure that there is no trailing whitespace anywhere (Xcode->Preferences->Text Editing->Automatically trim trailing whitespace + Including whitespace-only lines).
 * **1.5** Do not place opening braces on new lines - we use the [1TBS style](https://en.m.wikipedia.org/wiki/Indent_style#Variant:_1TBS).
@@ -112,8 +112,8 @@ func myFunctionWithManyParameters(parameterOne: String,
 }
 
 // Xcode indentation for a multi-line `if` statement
-if myFirstVariable > (mySecondVariable + myThirdVariable)
-    && myFourthVariable == .SomeEnumValue {
+if myFirstVariable > (mySecondVariable + myThirdVariable) &&
+    myFourthVariable == .SomeEnumValue {
 
     // Xcode indents to here for this kind of statement
     print("Hello, World!")
@@ -159,9 +159,9 @@ if firstCondition && secondCondition && thirdCondition {
 }
 
 // NOT PREFERRED
-if x == firstReallyReallyLongPredicateFunction()
-    && y == secondReallyReallyLongPredicateFunction()
-    && z == thirdReallyReallyLongPredicateFunction() {
+if x == firstReallyReallyLongPredicateFunction() &&
+    y == secondReallyReallyLongPredicateFunction() &&
+    z == thirdReallyReallyLongPredicateFunction() {
     // do something
 }
 ```
@@ -174,30 +174,30 @@ if x == firstReallyReallyLongPredicateFunction()
 
 * **2.3** Use `camelCase` (initial lowercase letter) for function, method, variable, constant, argument names, enum cases, etc.).
 
-* **2.4** When dealing with an acronym or other name that is usually written in all caps, actually use all caps in any names that use this in code. The exception is if this word is at the start of a name that needs to start with lowercase - in this case, use all lowercase for the acronym.
+* **2.4** When dealing with an acronym or other name that is usually written in all caps, do not use all caps in any names that use this in code. It doesn't require domain knowledge if you only capitalize the first letter, like so.
 
 ```swift
 // "HTML" is at the start of a variable name, so we use lowercase "html"
 let htmlBodyContent: String = "<p>Hello, World!</p>"
-// Prefer using ID to Id
-let profileID: Int = 1
-// Prefer URLFinder to UrlFinder
-class URLFinder {
+// Prefer using Id to ID
+let profileId: Int = 1
+// Prefer UrlFinder to URLFinder
+class UrlFinder {
     /* ... */
 }
 ```
 
-* **2.5** Use `k` prefix + PascalCase for naming all static constants that are not singletons.
+* **2.5** Use PascalCase for naming all static constants that are not singletons.
 
 ```swift
 class MyClassName {
-    // use `k` prefix for constant primitives
-    static let kSomeConstantHeight: CGFloat = 80.0
+    // use pascal case for constant primitives
+    static let SomeConstantHeight: CGFloat = 80.0
 
-    // use `k` prefix for non-primitives as well
-    static let kDeleteButtonColor = UIColor.redColor()
+    // use pascal case for non-primitives as well
+    static let DeleteButtonColor = UIColor.redColor()
 
-    // don't use `k` prefix for singletons
+    // don't use pascal case for singletons
     static let sharedInstance = MyClassName()
 
     /* ... */
@@ -476,10 +476,10 @@ do {
 
 ```swift
 // PREFERRED
-private static let kMyPrivateNumber: Int
+private static let MyPrivateNumber: Int
 
 // NOT PREFERRED
-static private let kMyPrivateNumber: Int
+static private let MyPrivateNumber: Int
 ```
 
 * **3.2.2** The access modifier keyword should not be on a line by itself - keep it inline with what it is describing.
@@ -497,13 +497,13 @@ class Pirate {
 }
 ```
 
-* **3.2.3** In general, do not write the `internal` access modifier keyword since it is the default.
+* **3.2.3** Write the `internal` access modifier keyword even though it is default, so that it is clear you have considered the access level of the type.
 
-* **3.2.4** If a variable needs to be accessed by unit tests, you will have to make it `internal` to use `@testable import ModuleName`. If a variable *should* be private, but you declare it to be `internal` for the purposes of unit testing, make sure you add an appropriate bit of documentation commenting that explains this. You can make use of the `- warning:` markup syntax for clarity as shown below.
+* **3.2.4** If a property needs to be accessed by unit tests, you will have to make it `internal` to use `@testable import ModuleName`. If a property *should* be private, but you declare it to be `internal` for the purposes of unit testing, make sure you add an appropriate bit of documentation commenting that explains this. You can make use of the `- warning:` markup syntax for clarity as shown below.
 
 ```swift
 /**
- This variable defines the pirate's name.
+ This property defines the pirate's name.
  - warning: Not `private` for `@testable`.
  */
 let pirateName = "LeChuck"
@@ -602,7 +602,7 @@ guard let myVariable = myVariable else {
 
 When implementing protocols, there are two ways of organizing your code:
 
-1. Using `// MARK:` comments to separate your protocol implementation from the rest of your code
+1. Using `// MARK:` comments to separate your protocol implementation from the rest of your code. Use `// MARK: - Protocols` to separate the whole section, and `// MARK: <ProtocolName>` for each protocol conformance.
 2. Using an extension outside your `class`/`struct` implementation code, but in the same source file
 
 Keep in mind that when using an extension, however, the methods in the extension can't be overridden by a subclass, which can make testing difficult. If this is a common use case, it might be better to stick with method #1 for consistency. Otherwise, method #2 allows for cleaner separation of concerns.
@@ -649,8 +649,8 @@ var computedProperty: String {
 
 ```swift
 class MyTableViewCell: UITableViewCell {
-    static let kReuseIdentifier = String(MyTableViewCell)
-    static let kCellHeight: CGFloat = 80.0
+    static let ReuseIdentifier = String(MyTableViewCell)
+    static let CellHeight: CGFloat = 80.0
 }
 ```
 
@@ -711,7 +711,7 @@ let completionBlock: () -> Void = {
 let completionBlock: (() -> Void)? = nil
 ```
 
-* **3.8.4** Keep parameter names on same line as the opening brace for closures when possible without too much horizontal overflow (i.e. ensure lines are less than 160 characters).
+* **3.8.4** Keep parameter names on same line as the opening brace for closures when possible without too much horizontal overflow (i.e. ensure lines are less than 120 characters).
 * **3.8.5** Use trailing closure syntax unless the meaning of the closure is not obvious without the parameter name (an example of this could be if a method has parameters for success and failure closures).
 
 ```swift
@@ -730,7 +730,7 @@ doSomething(1.0, success: { parameter1 in
 
 ### 3.9 Arrays
 
-* **3.9.1** In general, avoid accessing an array directly with subscripts. When possible, use accessors such as `.first` or `.last`, which are optional and won’t crash. Prefer using a `for item in items` syntax when possible as opposed to something like `for i in 0..<items.count`. If you need to access an array subscript directly, make sure to do proper bounds checking.
+* **3.9.1** In general, avoid accessing an array directly with subscripts. When possible, use accessors such as `.first` or `.last`, which are optional and won’t crash. Prefer using a `for item in items` syntax when possible as opposed to something like `for i in 0..<items.count`. If you need to access an array subscript directly, make sure to do proper bounds checking. You can use `for (index, value) in items.enumerate()` to get both the index and the value.
 
 * **3.9.2** Never use the `+=` or `+` operator to append/concatenate to arrays. Instead, use `.append()` or `.appendContentsOf()` as these are far more performant (at least with respect to compilation) in Swift's current state. If you are declaring an array that is based on other arrays and want to keep it immutable, instead of `let myNewArray = arr1 + arr2`, use `let myNewArray = [arr1, arr2].flatten()`.
 
@@ -931,17 +931,18 @@ guard let thingThree = thingThree else {
 }
 ```
 
-* **3.11.7** Don’t use one-liners for `guard` statements.
+* **3.11.7** Only use one-liners for `guard` statements when it is only returning.
 
 
 ```swift
 // PREFERRED
-guard let thingOne = thingOne else {
-    return
-}
+guard let thingOne = thingOne else { return }
 
 // NOT PREFERRED
-guard let thingOne = thingOne else { return }
+guard let thingOne = thingOne else { 
+    assertFailure("didn't work")
+    return 
+}
 ```
 
 ## 4. Documentation/Comments
@@ -956,7 +957,7 @@ Be sure to check out the full set of features available in Swift's comment marku
 
 Guidelines:
 
-* **4.1.1** 160 character column limit (like the rest of the code).
+* **4.1.1** 120 character column limit (like the rest of the code).
 
 * **4.1.2** Even if the doc comment takes up one line, use block (`/** */`).
 
