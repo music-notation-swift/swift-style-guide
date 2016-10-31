@@ -4,7 +4,7 @@ Make sure to read [Apple's API Design Guidelines](https://swift.org/documentatio
 
 Specifics from these guidelines + additional remarks are mentioned below.
 
-This guide was last updated for Swift 2.2 on 08/06/2016.
+This guide was last updated for Swift 3.0 on October 6th, 2016.
 
 ## Table Of Contents
 
@@ -64,7 +64,7 @@ let ninjaDictionary: [String: AnyObject] = [
 ]
 
 // declaring a function
-func myFunction<T, U: SomeProtocol where T.RelatedType == U>(firstArgument: U, secondArgument: T) {
+func myFunction<T, U: SomeProtocol>(firstArgument: U, secondArgument: T) where T.RelatedType == U {
     /* ... */
 }
 
@@ -95,7 +95,7 @@ let myValue = 20 + (30 / 2) * 3
 if 1 + 1 == 3 {
     fatalError("The universe is broken.")
 }
-func pancake() -> Pancake {
+func pancake(with syrup: Syrup) -> Pancake {
     /* ... */
 }
 ```
@@ -125,7 +125,7 @@ if myFirstValue > (mySecondValue + myThirdValue) &&
 ```swift
 someFunctionWithManyArguments(
     firstArgument: "Hello, I am a string",
-    secondArgument: resultFromSomeFunction()
+    secondArgument: resultFromSomeFunction(),
     thirdArgument: someOtherLocalProperty)
 ```
 
@@ -187,20 +187,27 @@ class UrlFinder {
 }
 ```
 
-* **2.5** Use PascalCase for naming all static constants that are not singletons.
+* **2.5** All constants other than singletons that are instance-independent should be `static`. All such `static` constants should be placed in a container `enum` type as per rule **3.1.16**. The naming of this container should be singular (e.g. `Constant` and not `Constants`) and it should be named such that it is relatively obvious that it is a constant container. If this is not obvious, you can add a `Constant` suffix to the name. You should use these containers to group constants that have similar or the same prefixes, suffixes and/or use cases.
 
 ```swift
 class MyClassName {
-    // use pascal case for constant primitives
-    static let SomeConstantHeight: CGFloat = 80.0
+    // PREFERRED
+    enum AccessibilityIdentifier {
+        static let pirateButton = "pirate_button"
+    }
+    enum SillyMathConstant {
+        static let indianaPi = 3
+    }
+    static let shared = MyClassName()
 
-    // use pascal case for non-primitives as well
-    static let DeleteButtonColor = UIColor.redColor()
-
-    // don't use pascal case for singletons
-    static let sharedInstance = MyClassName()
-
-    /* ... */
+    // NOT PREFERRED
+    static let kPirateButtonAccessibilityIdentifier = "pirate_button"
+    enum SillyMath {
+        static let indianaPi = 3
+    }
+    enum Singleton {
+        static let shared = MyClassName()
+    }
 }
 ```
 
@@ -257,7 +264,7 @@ class RoundAnimating: UIButton {
 class ConnectionTableViewCell: UITableViewCell {
     let personImageView: UIImageView
 
-    let animationDuration: NSTimeInterval
+    let animationDuration: TimeInterval
 
     // it is ok not to include string in the ivar name here because it's obvious
     // that it's a string from the property name
@@ -291,7 +298,7 @@ class ConnectionTableViewCell: UITableViewCell {
 
     // `animation` is not clearly a time interval
     // use `animationDuration` or `animationTimeInterval` instead
-    let animation: NSTimeInterval
+    let animation: TimeInterval
 
     // this is not obviously a `String`
     // use `transitionText` or `transitionString` instead
@@ -326,7 +333,7 @@ class ConnectionTableViewCell: UITableViewCell {
 ```swift
 // here, the name is a noun that describes what the protocol does
 protocol TableViewSectionProvider {
-    func rowHeight(atRow row: Int) -> CGFloat
+    func rowHeight(at row: Int) -> CGFloat
     var numberOfRows: Int { get }
     /* ... */
 }
@@ -374,7 +381,7 @@ let evenNumbers = [4, 8, 15, 16, 23, 42].filter { $0 % 2 == 0 }
 var evenNumbers: [Int] = []
 for integer in [4, 8, 15, 16, 23, 42] {
     if integer % 2 == 0 {
-        evenNumbers(integer)
+        evenNumbers.append(integer)
     }
 }
 ```
@@ -395,10 +402,10 @@ let lastName = name.lastName
 
 * **3.1.5** Be wary of retain cycles when creating delegates/protocols for your classes; typically, these properties should be declared `weak`.
 
-* **3.1.6** Be careful when calling `self` directly from a closure as this can cause a retain cycle - use a [capture list](https://developer.apple.com/library/ios/documentation/swift/conceptual/Swift_Programming_Language/Closures.html#//apple_ref/doc/uid/TP40014097-CH11-XID_163) when this might be the case:
+* **3.1.6** Be careful when calling `self` directly from an escaping closure as this can cause a retain cycle - use a [capture list](https://developer.apple.com/library/ios/documentation/swift/conceptual/Swift_Programming_Language/Closures.html#//apple_ref/doc/uid/TP40014097-CH11-XID_163) when this might be the case:
 
 ```swift
-myFunctionWithClosure() { [weak self] (error) -> Void in
+myFunctionWithEscapingClosure() { [weak self] (error) -> Void in
     // you can do this
 
     self?.doSomething()
@@ -433,20 +440,20 @@ if (x == y) {
 
 ```swift
 // PREFERRED
-imageView.setImageWithURL(url, type: .person)
+imageView.setImageWithUrl(url, type: .person)
 
 // NOT PREFERRED
-imageView.setImageWithURL(url, type: AsyncImageView.Type.person)
+imageView.setImageWithUrl(url, type: AsyncImageView.Type.person)
 ```
 
 * **3.1.10** Don’t use shorthand for class methods since it is generally more difficult to infer the context from class methods as opposed to `enum`s.
 
 ```swift
 // PREFERRED
-imageView.backgroundColor = UIColor.whiteColor()
+imageView.backgroundColor = UIColor.white
 
 // NOT PREFERRED
-imageView.backgroundColor = .whiteColor()
+imageView.backgroundColor = .white
 ```
 
 * **3.1.11** Prefer not writing `self.` unless it is required.
@@ -469,6 +476,11 @@ do {
 }
 ```
 
+* **3.1.14** Prefer `static` to `class` when declaring a function or property that is associated with a class as opposed to an instance of that class. Only use `class` if you specifically need the functionality of overriding that function or property in a subclass, though consider using a `protocol` to achieve this instead.
+
+* **3.1.15** If you have a function that takes no arguments, has no side effects, and returns some object or value, prefer using a computed property instead.
+
+* **3.1.16** For the purpose of namespacing a set of `static` functions and/or `static` properties, prefer using a caseless `enum` over a `class` or a `struct`. This way, you don't have to add a `private init() { }` to the container.
 
 ### 3.2 Access Modifiers
 
@@ -476,22 +488,22 @@ do {
 
 ```swift
 // PREFERRED
-private static let MyPrivateNumber: Int
+private static let myPrivateNumber: Int
 
 // NOT PREFERRED
-static private let MyPrivateNumber: Int
+static private let myPrivateNumber: Int
 ```
 
 * **3.2.2** The access modifier keyword should not be on a line by itself - keep it inline with what it is describing.
 
 ```swift
 // PREFERRED
-public class Pirate {
+open class Pirate {
     /* ... */
 }
 
 // NOT PREFERRED
-public
+open
 class Pirate {
     /* ... */
 }
@@ -508,6 +520,10 @@ class Pirate {
  */
 let pirateName = "LeChuck"
 ```
+
+* **3.2.5** Prefer `private` to `fileprivate` where possible.
+
+* **3.2.6** When choosing between `public` and `open`, prefer `open` if you intend for something to be subclassable outside of a given module and `public` otherwise. Note that anything `internal` and above can be subclassed in tests by using `@testable import`, so this shouldn't be a reason to use `open`. In general, lean towards being a bit more liberal with using `open` when it comes to libraries, but a bit more conservative when it comes to modules in a codebase such as an app where it is easy to change things in multiple modules simultaneously.
 
 ### 3.3 Custom Operators
 
@@ -551,11 +567,13 @@ func handleProblem(problem: Problem) {
 * **3.4.6** If you have a default case that shouldn't be reached, preferably throw an error (or handle it some other similar way such as asserting).
 
 ```swift
-func handleDigit(digit: Int) throws {
+func handleDigit(_ digit: Int) throws {
+    switch digit {
     case 0, 1, 2, 3, 4, 5, 6, 7, 8, 9:
         print("Yes, \(digit) is a digit!")
     default:
         throw Error(message: "The given number was not a digit.")
+    }
 }
 ```
 
@@ -592,7 +610,7 @@ unowned var parentViewController: UIViewController
 
 * **3.5.5** When unwrapping optionals, use the same name for the unwrapped constant or variable where appropriate.
 
-```
+```swift
 guard let myValue = myValue else {
     return
 }
@@ -626,39 +644,33 @@ var computedProperty: String {
 * **3.7.3** Though you can create a custom name for the new or old value for `willSet`/`didSet` and `set`, use the standard `newValue`/`oldValue` identifiers that are provided by default.
 
 ```swift
-var computedProperty: String {
-    get {
-        if someBool {
-            return "I'm a mighty pirate!"
-        }
-        return "I'm selling these fine leather jackets."
-    }
-    set {
-        computedProperty = newValue
-    }
+var storedProperty: String = "I'm selling these fine leather jackets." {
     willSet {
         print("will set to \(newValue)")
     }
     didSet {
-        print("did set from \(oldValue) to \(newValue)")
+        print("did set from \(oldValue) to \(storedProperty)")
+    }
+}
+
+var computedProperty: String  {
+    get {
+        if someBool {
+            return "I'm a mighty pirate!"
+        }
+        return storedProperty
+    }
+    set {
+        storedProperty = newValue
     }
 }
 ```
 
-* **3.7.4** Create class constants as `static` for any strings or constant values.
-
-```swift
-class MyTableViewCell: UITableViewCell {
-    static let ReuseIdentifier = String(MyTableViewCell)
-    static let CellHeight: CGFloat = 80.0
-}
-```
-
-* **3.7.5** You can declare a singleton property as follows:
+* **3.7.4** You can declare a singleton property as follows:
 
 ```swift
 class PirateManager {
-    static let sharedInstance = PirateManager()
+    static let shared = PirateManager()
 
     /* ... */
 }
@@ -683,24 +695,10 @@ doSomethingWithClosure() { response: NSURLResponse in
 [1, 2, 3].flatMap { String($0) }
 ```
 
-* **3.8.2** When listing parameters, if using a capture list and/or specifying a (non-void) return type, wrap the parameter list in parentheses. Otherwise, the parentheses can be avoided.
+* **3.8.2** If specifying a closure as a type, you don’t need to wrap it in parentheses unless it is required (e.g. if the type is optional or the closure is within another closure). Always wrap the arguments in the closure in a set of parentheses - use `()` to indicate no arguments and use `Void` to indicate that nothing is returned.
 
 ```swift
-// parentheses due to capture list
-doSomethingWithClosure() { [weak self] (response: NSURLResponse) in
-    self?.handleResponse(response)
-}
-
-// parentheses due to return type
-doSomethingWithClosure() { (response: NSURLResponse) -> String in
-    return String(response)
-}
-```
-
-* **3.8.3** If specifying a closure as a type, you don’t need to wrap it in parentheses unless it is required (e.g. if the type is optional or the closure is within another closure). Always wrap the arguments in the closure in a set of parentheses - use `()` to indicate no arguments and use `Void` to indicate that nothing is returned.
-
-```swift
-let completionBlock: (success: Bool) -> Void = {
+let completionBlock: (Bool) -> Void = { (success) in
     print("Success? \(success)")
 }
 
@@ -711,28 +709,29 @@ let completionBlock: () -> Void = {
 let completionBlock: (() -> Void)? = nil
 ```
 
-* **3.8.4** Keep parameter names on same line as the opening brace for closures when possible without too much horizontal overflow (i.e. ensure lines are less than 120 characters).
-* **3.8.5** Use trailing closure syntax unless the meaning of the closure is not obvious without the parameter name (an example of this could be if a method has parameters for success and failure closures).
+* **3.8.3** Keep parameter names on same line as the opening brace for closures when possible without too much horizontal overflow (i.e. ensure lines are less than 160 characters).
+
+* **3.8.4** Use trailing closure syntax unless the meaning of the closure is not obvious without the parameter name (an example of this could be if a method has parameters for success and failure closures).
 
 ```swift
 // trailing closure
-doSomething(1.0) { parameter1 in
+doSomething(1.0) { (parameter1) in
     print("Parameter 1 is \(parameter1)")
 }
 
 // no trailing closure
-doSomething(1.0, success: { parameter1 in
+doSomething(1.0, success: { (parameter1) in
     print("Success with \(parameter1)")
-}, failure: { parameter1 in
+}, failure: { (parameter1) in
     print("Failure with \(parameter1)")
 })
 ```
 
 ### 3.9 Arrays
 
-* **3.9.1** In general, avoid accessing an array directly with subscripts. When possible, use accessors such as `.first` or `.last`, which are optional and won’t crash. Prefer using a `for item in items` syntax when possible as opposed to something like `for i in 0..<items.count`. If you need to access an array subscript directly, make sure to do proper bounds checking. You can use `for (index, value) in items.enumerate()` to get both the index and the value.
+* **3.9.1** In general, avoid accessing an array directly with subscripts. When possible, use accessors such as `.first` or `.last`, which are optional and won’t crash. Prefer using a `for item in items` syntax when possible as opposed to something like `for i in 0 ..< items.count`. If you need to access an array subscript directly, make sure to do proper bounds checking. You can use `for (index, value) in items.enumerated()` to get both the index and the value.
 
-* **3.9.2** Never use the `+=` or `+` operator to append/concatenate to arrays. Instead, use `.append()` or `.appendContentsOf()` as these are far more performant (at least with respect to compilation) in Swift's current state. If you are declaring an array that is based on other arrays and want to keep it immutable, instead of `let myNewArray = arr1 + arr2`, use `let myNewArray = [arr1, arr2].flatten()`.
+* **3.9.2** Never use the `+=` or `+` operator to append/concatenate to arrays. Instead, use `.append()` or `.append(contentsOf:)` as these are far more performant (at least with respect to compilation) in Swift's current state. If you are declaring an array that is based on other arrays and want to keep it immutable, instead of `let myNewArray = arr1 + arr2`, use `let myNewArray = [arr1, arr2].flatten()`.
 
 ### 3.10 Error Handling
 
@@ -741,8 +740,8 @@ Suppose a function `myFunction` is supposed to return a `String`, however, at so
 Example:
 
 ```swift
-func readFile(withFilename filename: String) -> String? {
-    guard let file = openFile(filename) else {
+func readFile(named filename: String) -> String? {
+    guard let file = openFile(named: filename) else {
         return nil
     }
 
@@ -753,7 +752,7 @@ func readFile(withFilename filename: String) -> String? {
 
 func printSomeFile() {
     let filename = "somefile.txt"
-    guard let fileContents = readFile(filename) else {
+    guard let fileContents = readFile(named: filename) else {
         print("Unable to open file \(filename).")
         return
     }
@@ -763,10 +762,10 @@ func printSomeFile() {
 
 Instead, we should be using Swift's `try`/`catch` behavior when it is appropriate to know the reason for the failure.
 
-Use a `struct` such as the following:
+You can use a `struct` such as the following:
 
 ```swift
-struct Error: ErrorType {
+struct Error: Swift.Error {
     public let file: StaticString
     public let function: StaticString
     public let line: UInt
@@ -784,8 +783,8 @@ struct Error: ErrorType {
 Example usage:
 
 ```swift
-func readFile(withFilename filename: String) throws -> String {
-    guard let file = openFile(filename) else {
+func readFile(named filename: String) throws -> String {
+    guard let file = openFile(named: filename) else {
         throw Error(message: "Unable to open file named \(filename).")
     }
 
@@ -796,7 +795,7 @@ func readFile(withFilename filename: String) throws -> String {
 
 func printSomeFile() {
     do {
-        let fileContents = try readFile(filename)
+        let fileContents = try readFile(named: filename)
         print(fileContents)
     } catch {
         print(error)
@@ -814,7 +813,7 @@ In general, if a method can "fail", and the reason for the failure is not immedi
 
 ```swift
 // PREFERRED
-func eatDoughnut(atIndex index: Int) {
+func eatDoughnut(at index: Int) {
     guard index >= 0 && index < doughnuts else {
         // return early because the index is out of bounds
         return
@@ -825,7 +824,7 @@ func eatDoughnut(atIndex index: Int) {
 }
 
 // NOT PREFERRED
-func eatDoughnuts(atIndex index: Int) {
+func eatDoughnuts(at index: Int) {
     if index >= 0 && index < donuts.count {
         let doughnut = doughnuts[index]
         eat(doughnut)
@@ -840,21 +839,21 @@ func eatDoughnuts(atIndex index: Int) {
 guard let monkeyIsland = monkeyIsland else {
     return
 }
-bookVacation(onIsland: monkeyIsland)
-bragAboutVacation(onIsland: monkeyIsland)
+bookVacation(on: monkeyIsland)
+bragAboutVacation(at: monkeyIsland)
 
 // NOT PREFERRED
 if let monkeyIsland = monkeyIsland {
-    bookVacation(onIsland: monkeyIsland)
-    bragAboutVacation(onIsland: monkeyIsland)
+    bookVacation(on: monkeyIsland)
+    bragAboutVacation(at: monkeyIsland)
 }
 
 // EVEN LESS PREFERRED
 if monkeyIsland == nil {
     return
 }
-bookVacation(onIsland: monkeyIsland!)
-bragAboutVacation(onIsland: monkeyIsland!)
+bookVacation(on: monkeyIsland!)
+bragAboutVacation(at: monkeyIsland!)
 ```
 
 * **3.11.3** When deciding between using an `if` statement or a `guard` statement when unwrapping optionals is *not* involved, the most important thing to keep in mind is the readability of the code. There are many possible cases here, such as depending on two different booleans, a complicated logical statement involving multiple comparisons, etc., so in general, use your best judgement to write code that is readable and consistent. If you are unsure whether `guard` or `if` is more readable or they seem equally readable, prefer using `guard`.
@@ -902,7 +901,7 @@ if let monkeyIsland = monkeyIsland {
     bookVacation(onIsland: monkeyIsland)
 }
 
-if let woodchuck = woodchuck where canChuckWood(woodchuck) {
+if let woodchuck = woodchuck, canChuckWood(woodchuck) {
     woodchuck.chuckWood()
 }
 ```
@@ -940,7 +939,6 @@ guard let thingOne = thingOne else { return }
 
 // NOT PREFERRED
 guard let thingOne = thingOne else { 
-    assertFailure("didn't work")
     return 
 }
 ```
@@ -949,7 +947,7 @@ guard let thingOne = thingOne else {
 
 ### 4.1 Documentation
 
-If a function is more complicated than a simple O(1) operation, you should generally consider adding a doc comment for the function since there could be some information that the method signature does not make immediately obvious (A very useful plugin to do this [called VVDocumenter can be found here](https://github.com/onevcat/VVDocumenter-Xcode)). If there are any quirks to the way that something was implemented, whether technically interesting, tricky, not obvious, etc., this should be documented. Documentation should be added for complex classes/structs/enums/protocols and properties. All `public` functions/classes/properties/constants/structs/enums/protocols/etc. should be documented as well (provided, again, that their signature/name does not make their meaning/functionality immediately obvious).
+If a function is more complicated than a simple O(1) operation, you should generally consider adding a doc comment for the function since there could be some information that the method signature does not make immediately obvious. If there are any quirks to the way that something was implemented, whether technically interesting, tricky, not obvious, etc., this should be documented. Documentation should be added for complex classes/structs/enums/protocols and properties. All `public` functions/classes/properties/constants/structs/enums/protocols/etc. should be documented as well (provided, again, that their signature/name does not make their meaning/functionality immediately obvious).
 
 After writing a doc comment, you should option click the function/property/class/etc. to make sure that everything is formatted correctly.
 
@@ -963,7 +961,7 @@ Guidelines:
 
 * **4.1.3** Do not prefix each additional line with a `*`.
 
-* **4.1.4** Use the new `- parameter` syntax as opposed to the old `:param:` syntax (make sure to use lower case `parameter` and not `Parameter`).
+* **4.1.4** Use the new `- parameter` syntax as opposed to the old `:param:` syntax (make sure to use lower case `parameter` and not `Parameter`). See [the documentation on Swift Markup](https://developer.apple.com/library/watchos/documentation/Xcode/Reference/xcode_markup_formatting_ref/) for more details on how this is formatted.
 
 * **4.1.5** If you’re going to be documenting the parameters/returns/throws of a method, document all of them, even if some of the documentation ends up being somewhat repetitive (this is preferable to having the documentation look incomplete). Sometimes, if only a single parameter warrants documentation, it might be better to just mention it in the description instead.
 
