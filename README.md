@@ -1150,9 +1150,7 @@ Be sure to check out the full set of features available in Swift's comment marku
 
 Guidelines:
 
-* **5.1.1** 120 character column limit (like the rest of the code).
-
-* **5.1.2** Even if the doc comment takes up one line, use block (`/** */`).
+* **5.1.1** 160 character column limit (like the rest of the code).
 
 * **5.1.3** Do not prefix each additional line with a `*`.
 
