@@ -36,15 +36,16 @@ Note that brevity is not a primary goal. Code should be made more concise only i
         - [3.9 Arrays](#39-arrays)
         - [3.10 Error Handling](#310-error-handling)
         - [3.11 Using `guard` Statements](#311-using-guard-statements)
-    - [4. Documentation/Comments](#4-documentationcomments)
-        - [4.1 Documentation](#41-documentation)
-        - [4.2 Other Commenting Guidelines](#42-other-commenting-guidelines)
+    - [4. File Organization]()
+    - [5. Documentation/Comments](#5-documentationcomments)
+        - [5.1 Documentation](#51-documentation)
+        - [5.2 Other Commenting Guidelines](#52-other-commenting-guidelines)
 
 ## 1. Code Formatting
 
 * **1.1** Indent using **TAB**s, with a width of 4 spaces per tab. [![SwiftFormat: indent](https://img.shields.io/badge/SwiftFormat-indent-7B0051.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#indent)
 * **1.2** Avoid uncomfortably long lines with a hard maximum of 160 characters per line (Xcode->Preferences->Text Editing->Page guide at column: 160 is helpful for this)
-* **1.3** Ensure that there is a newline at the end of every file.
+* **1.3** Ensure that there is a newline at the end of every file. [![SwiftLint: trailing_newline](https://img.shields.io/badge/SwiftLint-trailing__newline-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#trailing-newline)
 * **1.4** Ensure that there is no trailing whitespace anywhere (Xcode->Preferences->Text Editing->Automatically trim trailing whitespace + Including whitespace-only lines). [![SwiftFormat: trailingSpace](https://img.shields.io/badge/SwiftFormat-trailingSpace-7B0051.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#trailingSpace)
 * **1.5** Do not place opening braces on new lines - we use the [1TBS style](https://en.m.wikipedia.org/wiki/Indent_style#Variant:_1TBS).
 
@@ -782,7 +783,7 @@ Even when using method #2, add `// MARK:` statements anyway for easier readabili
 	```
 	</details>
 
-* **3.8.2** If specifying a closure as a type, you don’t need to wrap it in parentheses unless it is required (e.g. if the type is optional or the closure is within another closure). Always wrap the arguments in the closure in a set of parentheses - use `()` to indicate no arguments and use `Void` to indicate that nothing is returned.
+* **3.8.2** If specifying a closure as a type, you don’t need to wrap it in parentheses unless it is required (e.g. if the type is optional or the closure is within another closure). Always wrap the arguments in the closure in a set of parentheses - use `()` to indicate no arguments and use `Void` to indicate that nothing is returned. [![SwiftLint: void_return](https://img.shields.io/badge/SwiftLint-void__return-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#void-return)
 
 	<details>
 	```swift
@@ -817,6 +818,8 @@ Even when using method #2, add `// MARK:` statements anyway for easier readabili
 	})
 	```
 	</details>
+
+* **3.8.5** Single-line closures should have a space inside each brace. [![SwiftLint: closure_spacing](https://img.shields.io/badge/SwiftLint-closure__spacing-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#closure-spacing)
 
 ### 3.9 Arrays
 
@@ -1056,9 +1059,88 @@ In general, if a method can "fail", and the reason for the failure is not immedi
 
 **[⬆ back to top](#table-of-contents)**
 
-## 4. Documentation/Comments
+## 4. File Organization
 
-### 4.1 Documentation
+* **4.1** Alphabetize and deduplicate module imports within a file. Place all imports at the top of the file below the header comments. Do not add additional line breaks between import statements. Add a single empty line before the first import and after the last import. [![SwiftFormat: sortedImports](https://img.shields.io/badge/SwiftFormat-sortedImports-7B0051.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#sortedImports) [![SwiftFormat: duplicateImports](https://img.shields.io/badge/SwiftFormat-duplicateImports-7B0051.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#duplicateImports)
+
+	<details>
+	```swift
+	// WRONG
+
+	//  Copyright © 2018 Airbnb. All rights reserved.
+	//
+	import DLSPrimitives
+	import Constellation
+	import Constellation
+	import Epoxy
+
+	import Foundation
+
+	//RIGHT
+
+	//  Copyright © 2018 Airbnb. All rights reserved.
+	//
+
+	import Constellation
+	import DLSPrimitives
+	import Epoxy
+	import Foundation
+	```
+	</details>
+
+	_Exception: `@testable import` should be grouped after the regular import and separated by an empty line._
+
+	<details>
+	```swift
+	// WRONG
+
+	//  Copyright © 2018 Airbnb. All rights reserved.
+	//
+
+	import DLSPrimitives
+	@testable import Epoxy
+	import Foundation
+	import Nimble
+	import Quick
+
+	//RIGHT
+
+	//  Copyright © 2018 Airbnb. All rights reserved.
+	//
+
+	import DLSPrimitives
+	import Foundation
+	import Nimble
+	import Quick
+
+	@testable import Epoxy
+	```
+	</details>
+
+* **4.2** <a id='limit-vertical-whitespace'></a>(<a href='#limit-vertical-whitespace'>link</a>) **Limit empty vertical whitespace to one line.** Favor the following formatting guidelines over whitespace of varying heights to divide files into logical groupings. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftLint-vertical__whitespace-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#vertical-whitespace)
+
+* **4.3** Add empty lines between property declarations of different kinds. [![SwiftFormat: organizeDeclarations](https://img.shields.io/badge/SwiftFormat-organizeDeclarations-008489.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#organizeDeclarations)
+
+	<details>
+	```swift
+	// WRONG
+	static let gravityEarth: CGFloat = 9.8
+	static let gravityMoon: CGFloat = 1.6
+	var gravity: CGFloat
+
+	// RIGHT
+	static let gravityEarth: CGFloat = 9.8
+	static let gravityMoon: CGFloat = 1.6
+
+	var gravity: CGFloat
+	```
+	</details>
+
+**[⬆ back to top](#table-of-contents)**
+
+## 5. Documentation/Comments
+
+### 5.1 Documentation
 
 If a function is more complicated than a simple O(1) operation, you should generally consider adding a doc comment for the function since there could be some information that the method signature does not make immediately obvious. If there are any quirks to the way that something was implemented, whether technically interesting, tricky, not obvious, etc., this should be documented. Documentation should be added for complex classes/structs/enums/protocols and properties. All `public` functions/classes/properties/constants/structs/enums/protocols/etc. should be documented as well (provided, again, that their signature/name does not make their meaning/functionality immediately obvious).
 
@@ -1068,17 +1150,17 @@ Be sure to check out the full set of features available in Swift's comment marku
 
 Guidelines:
 
-* **4.1.1** 120 character column limit (like the rest of the code).
+* **5.1.1** 120 character column limit (like the rest of the code).
 
-* **4.1.2** Even if the doc comment takes up one line, use block (`/** */`).
+* **5.1.2** Even if the doc comment takes up one line, use block (`/** */`).
 
-* **4.1.3** Do not prefix each additional line with a `*`.
+* **5.1.3** Do not prefix each additional line with a `*`.
 
-* **4.1.4** Use the new `- parameter` syntax as opposed to the old `:param:` syntax (make sure to use lower case `parameter` and not `Parameter`). See [the documentation on Swift Markup](https://developer.apple.com/library/watchos/documentation/Xcode/Reference/xcode_markup_formatting_ref/) for more details on how this is formatted.
+* **5.1.4** Use the new `- parameter` syntax as opposed to the old `:param:` syntax (make sure to use lower case `parameter` and not `Parameter`). See [the documentation on Swift Markup](https://developer.apple.com/library/watchos/documentation/Xcode/Reference/xcode_markup_formatting_ref/) for more details on how this is formatted.
 
-* **4.1.5** If you’re going to be documenting the parameters/returns/throws of a method, document all of them, even if some of the documentation ends up being somewhat repetitive (this is preferable to having the documentation look incomplete). Sometimes, if only a single parameter warrants documentation, it might be better to just mention it in the description instead.
+* **5.1.5** If you’re going to be documenting the parameters/returns/throws of a method, document all of them, even if some of the documentation ends up being somewhat repetitive (this is preferable to having the documentation look incomplete). Sometimes, if only a single parameter warrants documentation, it might be better to just mention it in the description instead.
 
-* **4.1.6** For complicated classes, describe the usage of the class with some potential examples as seems appropriate. Remember that markdown syntax is valid in Swift's comment docs. Newlines, lists, etc. are therefore appropriate.
+* **5.1.6** For complicated classes, describe the usage of the class with some potential examples as seems appropriate. Remember that markdown syntax is valid in Swift's comment docs. Newlines, lists, etc. are therefore appropriate.
 
 	<details>
 	```swift
@@ -1113,7 +1195,7 @@ Guidelines:
 	```
 	</details>
 
-* **4.1.7** When mentioning code, use code ticks - \`
+* **5.1.7** When mentioning code, use code ticks - \`
 
 	<details>
 	```swift
@@ -1127,13 +1209,13 @@ Guidelines:
 	```
 	</details>
 
-* **4.1.8** When writing doc comments, prefer brevity where possible.
+* **5.1.8** When writing doc comments, prefer brevity where possible.
 
-### 4.2 Other Commenting Guidelines
+### 5.2 Other Commenting Guidelines
 
-* **4.2.1** Always leave a space after `//`.
-* **4.2.2** Always leave comments on their own line.
-* **4.2.3** When using `// MARK: - whatever`, leave a newline after the comment.
+* **5.2.1** Always leave a space after `//`.
+* **5.2.2** Always leave comments on their own line.
+* **5.2.3** When using `// MARK: - whatever`, leave a newline after the comment.
 
 	<details>
 	```swift
