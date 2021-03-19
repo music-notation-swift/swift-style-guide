@@ -616,7 +616,7 @@ Note that brevity is not a primary goal. Code should be made more concise only i
 	```
 	</details>
 
-* **3.2.5** Prefer `private` to `fileprivate` where possible. [![SwiftLint: closure_spacing](https://img.shields.io/badge/SwiftLint-redundantFileprivate-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#redundantFileprivate)
+* **3.2.5** Prefer `private` to `fileprivate` where possible. [![SwiftLint: closure_spacing](https://img.shields.io/badge/SwiftFormat-redundantFileprivate-7B0051.svg)](https://github.com/realm/SwiftFormat/blob/master/Rules.md#redundantFileprivate)
 
 * **3.2.6** When choosing between `public` and `open`, prefer `open` if you intend for something to be subclassable outside of a given module and `public` otherwise. Note that anything `internal` and above can be subclassed in tests by using `@testable import`, so this shouldn't be a reason to use `open`. In general, lean towards being a bit more liberal with using `open` when it comes to libraries, but a bit more conservative when it comes to modules in a codebase such as an app where it is easy to change things in multiple modules simultaneously.
 
@@ -628,30 +628,30 @@ Note that brevity is not a primary goal. Code should be made more concise only i
 
 	You can override existing operators to support new types (especially `==`). However, your new definitions must preserve the semantics of the operator. For example, `==` must always test equality and return a boolean.
 
-* **3.3.2** In conformance with Swift as of version 5+, prefer a comma over `&&` in `if`, `guard` or `while` conditions. [![SwiftLint: closure_spacing](https://img.shields.io/badge/SwiftLint-andOperator-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#andOperator)
+* **3.3.2** In conformance with Swift as of version 5+, prefer a comma over `&&` in `if`, `guard` or `while` conditions. [![SwiftLint: closure_spacing](https://img.shields.io/badge/SwiftFormat-andOperator-7B0051.svg)](https://github.com/realm/SwiftFormat/blob/master/Rules.md#andOperator)
 
-<details>
+	<details>
 	<summary>Examples</summary>
-```diff
-- if true && true {
-+ if true, true {
-```
+	```diff
+	- if true && true {
+	+ if true, true {
+	```
 
-```diff
-- guard true && true else {
-+ guard true, true else {
-```
+	```diff
+	- guard true && true else {
+	+ guard true, true else {
+	```
 
-```diff
-- if functionReturnsBool() && true {
-+ if functionReturnsBool(), true {
-```
+	```diff
+	- if functionReturnsBool() && true {
+	+ if functionReturnsBool(), true {
+	```
 
-```diff
-- if functionReturnsBool() && variable {
-+ if functionReturnsBool(), variable {
-```
-</details>
+	```diff
+	- if functionReturnsBool() && variable {
+	+ if functionReturnsBool(), variable {
+	```
+	</details>
 
 ### 3.4 Switch Statements and `enum`s
 
@@ -1208,7 +1208,7 @@ In general, if a method can "fail", and the reason for the failure is not immedi
 
 * **4.2** <a id='limit-vertical-whitespace'></a>(<a href='#limit-vertical-whitespace'>link</a>) **Limit empty vertical whitespace to one line.** Favor the following formatting guidelines over whitespace of varying heights to divide files into logical groupings. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftLint-vertical__whitespace-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#vertical-whitespace)
 
-* **4.3** Add empty lines between property declarations of different kinds. [![SwiftFormat: organizeDeclarations](https://img.shields.io/badge/SwiftFormat-organizeDeclarations-008489.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#organizeDeclarations)
+* **4.3** Add empty lines between property declarations of different kinds. [![SwiftFormat: organizeDeclarations](https://img.shields.io/badge/SwiftFormat-organizeDeclarations-7B0051.svg)](https://github.com/nicklockwood/SwiftFormat/blob/master/Rules.md#organizeDeclarations)
 
 	<details>
 	<summary>Examples</summary>
@@ -1226,7 +1226,7 @@ In general, if a method can "fail", and the reason for the failure is not immedi
 	```
 	</details>
 
-* **4.4** Remove trailing blank line at the end of a scope. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftLint-blankLinesAtEndOfScope-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#blankLinesAtEndOfScope)
+* **4.4** Remove trailing blank line at the end of a scope. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftFormat-blankLinesAtEndOfScope-7B0051.svg)](https://github.com/realm/SwiftFormat/blob/master/Rules.md#blankLinesAtEndOfScope)
 
 	<details>
 	<summary>Examples</summary>
@@ -1339,7 +1339,7 @@ Guidelines:
 
 * **5.2.1** Always leave a space after `//`.
 * **5.2.2** Always leave comments on their own line.
-* **5.2.3** When using `// MARK: - whatever`, leave a newline after the comment. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftLint-blankLinesAroundMark-007A87.svg)](https://github.com/realm/SwiftLint/blob/master/Rules.md#blankLinesAroundMark)
+* **5.2.3** When using `// MARK: - whatever`, leave a newline after the comment. [![SwiftLint: vertical_whitespace](https://img.shields.io/badge/SwiftFormat-blankLinesAroundMark-7B0051.svg)](https://github.com/realm/SwiftFormat/blob/master/Rules.md#blankLinesAroundMark)
 
 	<details>
 	<summary>Examples</summary>
@@ -1359,3 +1359,5 @@ Guidelines:
 	}
 	```
 	</details>
+
+**[⬆ back to top](#table-of-contents)**
